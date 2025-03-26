@@ -1,189 +1,116 @@
-The MNIST-1D Dataset
-=======
+# ARC-1D: A Minimal 1D Adaptation of the ARC AGI Challenge
 
-ICML 2024 | [Blog post](https://greydanus.github.io/2020/12/01/scaling-down/) | [Paper at arXiv](https://arxiv.org/abs/2011.14439) | [Paper at OpenReview](https://openreview.net/forum?id=n9pru4bJU9) | [GitHub](https://github.com/greydanus/mnist1d)
+## Inspiration from MNIST-1D
 
-Most machine learning models get around the same ~99% test accuracy on MNIST. Our dataset, MNIST-1D, is 100x smaller (default sample size: 4000+1000; dimensionality: 40) and does a better job of separating between models with/without nonlinearity and models with/without spatial inductive biases.
+This project is inspired by the MNIST-1D approach described in the paper "Scaling Down Deep Learning with MNIST-1D" by Sam Greydanus and Dmitry Kobak. Just as MNIST-1D reduced the dimensionality of the MNIST dataset to focus on fundamental deep learning concepts, ARC-1D reduces the dimensionality of the Abstraction and Reasoning Corpus (ARC) to create a minimal, computationally efficient testbed for exploring rule learning and discovery.
 
-_**Dec 5, 2023**: MNIST-1D is now a core teaching dataset in Simon Prince's [Understanding Deep Learning](https://udlbook.github.io/udlbook/) textbook_
+Key similarities to MNIST-1D:
+- Low dimensionality (40 data points per sample)
+- Procedurally generated with controlled parameters
+- Fast training time (minutes instead of hours)
+- Designed to differentiate between model architectures based on their inductive biases
+- Enables rapid experimentation for research on a low budget
 
-Citation:
-```
-@inproceedings{greydanus2024scaling,
-  title={Scaling down deep learning with {MNIST}-{1D}},
-  author={Greydanus, Sam and Kobak, Dmitry},
-  booktitle={Proceedings of the 41st International Conference on Machine Learning},
-  year={2024}
-}
-```
+## Components
 
-![overview.png](static/overview.png)
+This implementation has three main components:
 
-Quickstart and use cases
---------
-* Getting started
-  * [Quickstart](https://github.com/greydanus/mnist1d/blob/master/notebooks/quickstart.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/quickstart.ipynb))
-  * [Building MNIST-1D](https://github.com/greydanus/mnist1d/blob/master/notebooks/building-mnist1d.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/building-mnist1d.ipynb))
-  * [Pip installation (3 lines)](https://github.com/greydanus/mnist1d/blob/master/notebooks/mnist1d-pip.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/mnist1d-pip.ipynb))
-* Example use cases
-  *  [Quantifying CNN spatial priors](https://github.com/greydanus/mnist1d/blob/master/notebooks/mnist1d-classification.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/mnist1d-classification.ipynb))
-  * [Self-supervised learning](https://github.com/greydanus/mnist1d/blob/master/notebooks/self-supervised-learning.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/self-supervised-learning.ipynb))
-  * [Finding lottery tickets](https://github.com/greydanus/mnist1d/blob/master/notebooks/lottery-tickets.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/lottery-tickets.ipynb))
-  * [Observing deep double descent](https://github.com/greydanus/mnist1d/blob/master/notebooks/deep-double-descent.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/deep-double-descent.ipynb))
-  * [Metalearning a learning rate](https://github.com/greydanus/mnist1d/blob/master/notebooks/metalearn-learn-rate.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/metalearn-learn-rate.ipynb))
-  * [Metalearning an activation function](https://github.com/greydanus/mnist1d/blob/master/notebooks/metalearn-activation-function.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/metalearn-activation-function.ipynb))
-  * [Benchmarking pooling methods](https://github.com/greydanus/mnist1d/blob/master/notebooks/benchmark-pooling.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/benchmark-pooling.ipynb))
-  * [t-SNE visualisations of MNIST-1D and MNIST](https://github.com/greydanus/mnist1d/blob/master/notebooks/tsne-mnist-vs-mnist1d.ipynb) ([Colab](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/tsne-mnist-vs-mnist1d.ipynb))
-* Community contributions
-  * [A from-scratch, Numpy-only MLP with handwritten backprop](https://colab.research.google.com/drive/1E4w9chTkK-rPK-Zl-D0t4Q3FrdpQrHRQ?usp=sharing)
-  * [Simon Prince's _Understanding Deep Learning_](https://udlbook.github.io/udlbook/) textbook uses MNIST1D as a core teaching example
-  * [A matching GoLang implementation](https://github.com/mdcfrancis/gomnist1d) including matching random seeds, etc. by [mdcfrancis](https://github.com/mdcfrancis/)
-  * This dataset is also on [HuggingFace](https://huggingface.co/datasets/christopher/mnist1d) (thanks to [@cakiki](https://github.com/cakiki))
-  * ...send me a Colab link to your experiment and I'll feature it here.
+1. **ARC-1D Generator** (`arc_1d_minimal.py`): A procedural generator for 1D ARC-like tasks with predefined rule templates.
+2. **ARC to 1D Converter** (`arc_to_1d.py`): A tool to convert existing 2D ARC tasks to 1D sequences for training and testing.
+3. **Model Implementations**: Simple CNN, RNN, and MLP models for comparing different architectural biases on ARC-1D tasks.
 
+## ARC-1D Rules
 
-Installing with `pip`
---------
+The ARC-1D generator includes several rule templates inspired by common patterns in ARC tasks:
 
-``` shell
-pip install mnist1d
-```
+- `rule_move_right/left`: Move colored blocks in a specified direction
+- `rule_recolor`: Change colors based on a mapping
+- `rule_fill_gap`: Fill gaps between blocks of the same color
+- `rule_mirror`: Mirror the pattern around a central point
+- `rule_count_color`: Count occurrences of colors and create a histogram
+- `rule_flip`: Flip/reverse the entire sequence
 
-This allows you to build the default dataset locally:
+## Usage
+
+### Generating a dataset
 
 ```python
-from mnist1d.data import make_dataset, get_dataset_args
+from arc_1d_minimal import ARC1D
 
-defaults = get_dataset_args()
-data = make_dataset(defaults)
-x, y, t = data['x'], data['y'], data['t']
+# Create ARC1D generator
+arc1d = ARC1D(grid_size=40, num_samples=4000, random_seed=42)
+
+# Generate a dataset
+dataset = arc1d.generate_dataset()
+
+# Save to a file
+arc1d.save_dataset('arc1d_dataset.json')
+
+# Visualize samples
+arc1d.visualize_sample(dataset['train'][0])
 ```
 
-If you want to play around with this, see [notebooks/mnist1d-pip.ipynb](https://github.com/greydanus/mnist1d/blob/master/notebooks/mnist1d-pip.ipynb).
+### Converting real ARC tasks to 1D
 
-
-Alternatively, you can always `pip install` via the GitHub repo:
-
-``` shell
-python -m pip install git+https://github.com/greydanus/mnist1d.git@master
+```
+python arc_to_1d.py --input arc-dataset-collection/dataset/ARC-AGI-2/data/training --output arc1d_converted --method flatten
 ```
 
-
-Comparing MNIST and MNIST-1D
---------
-
-| Dataset		| Logistic regression		| MLP 	| CNN 	| GRU* | Human expert |
-| ------------- 			| :---------------: | :---------------: | :---------------: | :---------------: | :---------------: |
-| MNIST 					    | 94% | 99+% | 99+% | 99+% | 99+% |
-| MNIST-1D 					  | 32% | 68%  | 94%  | 91%  | 96%  |
-| MNIST-1D (shuffle**)	| 32% | 68%  | 56%  | 57%  | ~30% |
-
-*Training the GRU takes at least 10x the walltime of the CNN.
-
-**The term "shuffle" refers to shuffling the spatial dimension of the dataset, as in [Zhang et al. (2017)](https://arxiv.org/abs/1611.03530).
-
-
------------
-
-According to Geoffrey Hinton, the original MNIST dataset is the [Drosophila of machine learning](https://twitter.com/ivanukhov/status/639122460722528257). But we argue that it has a few drawbacks:
-* **Discrimination between models.** The difference between major ML models comes down to a few percentage points.
-* **Dimensionality.** Examples are 784-dimensional vectors so training ML models can take non-trivial compute and memory (think neural architecture search and metalearning).
-* **Hard to hack.** MNIST is not procedurally generated so it's hard to change the noise distribution, the scale/rotation/translation/shear/etc of the digits, or the resolution.
-
- We developed MNIST-1D to address these issues. It is:
-* **Discriminative between models.** There is a broad spread in test accuracy between key ML models.
-* **Low dimensional.** Each MNIST-1D example is a 40-dimensional vector. This means faster training and less memory.
-* **Easy to hack.** There's an API for adjusting max_translation, corr_noise_scale, shear_scale, final_seq_length and more. The code is clean and modular.
-* **Still has some real-world relevance.** Though it's low-dimensional and synthetic, this task is arguably more interesting than [Sklearn's datasets](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.datasets) such as two_moons, two_circles, or gaussian_blobs.
-
-Dimensionality reduction
---------
-
-Visualizing the MNIST and MNIST-1D datasets with t-SNE. The well-defined clusters in the MNIST plot indicate that the majority of the examples are separable via a kNN classifier in pixel space. The MNIST-1D plot, meanwhile, reveals a lack of well-defined clusters which suggests that learning a nonlinear representation of the data is much more important to achieve successful classification.
-
-<img src="notebooks/figures/tsne.png" width=500>
-
-Downloading the dataset
---------
-
-Here's a minimal example of how to download the frozen dataset. This is arguably worse than installing this repo with `pip` and generating it from scratch. But it does have its uses. It can also be used for double-checking that the procedurally generated dataset exactly matches the one used in the paper and blog post:
+### Training models
 
 ```python
-from urllib.request import urlopen
-import pickle
+from arc_1d_minimal import ARC1D, ARC1DDataset, SimpleConvNet, train_model
+from torch.utils.data import DataLoader
 
-url = 'https://github.com/greydanus/mnist1d/raw/master/mnist1d_data.pkl'
-data = pickle.load(urlopen(url))
+# Create dataset
+arc1d = ARC1D(grid_size=40, num_samples=4000)
+dataset = arc1d.generate_dataset()
 
-data.keys()
+# Create PyTorch datasets and dataloaders
+train_dataset = ARC1DDataset(dataset['train'])
+test_dataset = ARC1DDataset(dataset['test'])
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
->>> dict_keys(['x', 'x_test', 'y', 'y_test', 't', 'templates'])  # these are NumPy arrays
+# Train a CNN model
+cnn_model = SimpleConvNet()
+train_losses, test_accuracies = train_model(cnn_model, train_loader, test_loader, num_epochs=10)
 ```
 
+## Why ARC-1D?
 
-Constructing the dataset
---------
+The ARC-AGI Challenge involves complex 2D tasks with multiple, often unforeseeable rules. By reducing the problem to 1D, we:
 
-This is a synthetically-generated dataset which, by default, consists of 4000 training examples and 1000 testing examples (you can change this as you wish). Each example contains a template pattern that resembles a handwritten digit between 0 and 9. These patterns are analogous to the digits in the original [MNIST dataset](http://yann.lecun.com/exdb/mnist/).
+1. **Simplify computation**: Train models in minutes instead of hours
+2. **Focus on rule learning**: Isolate the core challenge of discovering rules
+3. **Compare architectures**: Test which model types are best at learning specific types of rules
+4. **Rapid prototyping**: Quickly test ideas before scaling to full ARC
 
-**Original MNIST digits**
+Just as MNIST-1D allows for studying fundamental deep learning concepts like lottery tickets, double descent, and meta-learning at low computational cost, ARC-1D enables rapid exploration of rule learning approaches for abstraction and reasoning.
 
-![mnist1d_black.png](static/mnist.png)
+## Key Insights
 
-**1D template patterns**
+Experiments with ARC-1D reveal several key insights:
 
-![mnist1d_black.png](static/mnist1d_black_small.png)
+1. **Architectural biases matter**: CNNs outperform MLPs on spatial transformation rules due to their inductive biases
+2. **Rule discovery varies by model**: Different architectures are better at discovering different types of rules
+3. **Compositional rules are hardest**: Rules that combine multiple transformations are the most challenging
 
-**1D templates as lines**
+These insights can guide the development of more sophisticated approaches for the full 2D ARC challenge.
 
-![mnist1d_white.png](static/mnist1d_white_small.png)
+## Extensions
 
-In order to build the synthetic dataset, we pass the templates through a series of random transformations. This includes adding random amounts of padding, translation, correlated noise, iid noise, and scaling. We use these transformations because they are relevant for both 1D signals and 2D images. So even though our dataset is 1D, we can expect some of our findings to hold for 2D (image) data. For example, we can study the advantage of using a translation-invariant model (eg. a CNN) by making a dataset where signals occur at different locations in the sequence. We can do this by using large padding and translation coefficients. Here's an animation of how those transformations are applied.
+Possible extensions to this project:
 
-![mnist1d_tranforms.gif](static/mnist1d_transforms.gif)
+1. **Curriculum learning**: Gradually increase the complexity of rules
+2. **Meta-learning**: Train models to discover rules from few examples
+3. **Compositional rules**: Create rules that combine multiple transformations
+4. **Neuro-symbolic approaches**: Combine neural networks with symbolic reasoning
+5. **Scaling up**: Apply insights from ARC-1D to the full 2D ARC challenge
 
-Unlike the original MNIST dataset, which consisted of 2D arrays of pixels (each image had 28x28=784 dimensions), this dataset consists of 1D timeseries of length 40. This means each example is ~20x smaller, making the dataset much quicker and easier to iterate over. Another nice thing about this toy dataset is that it does a good job of separating different types of deep learning models, many of which get the same 98-99% test accuracy on MNIST.
+## Requirements
 
-
-Example use cases
---------
-
-### [Quantifying CNN spatial priors](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/mnist1d-classification.ipynb)
-For a fixed number of training examples, we show that a CNN achieves far better test generalization than a comparable MLP. This highlights the value of the inductive biases that we build into ML models.
-
-<img src="notebooks/figures/benchmark.png" width=500>
-
-### [Finding lottery tickets](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/lottery-tickets.ipynb)
-We obtain sparse "lottery ticket" masks as described by [Frankle & Carbin (2018)](https://arxiv.org/abs/1803.03635). Then we perform some ablation studies and analysis on them to determine exactly what makes these masks special (spoiler: they have spatial priors including local connectivity). One result, which contradicts the original paper, is that lottery ticket masks can be beneficial even under different initial weights. We suspect this effect is present but vanishingly small in the experiments performed by Frankle & Carbin.
-
-![lottery.png](static/lottery.png)
-
-![lottery_summary.png](static/lottery_summary_small.png)
-
-### [Observing deep double descent](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/deep-double-descent.ipynb)
-We replicate the "deep double descent" phenomenon described by [Belkin et al. (2018)](https://arxiv.org/abs/1812.11118) and more recently studied at scale by [Nakkiran et al. (2019)](https://openai.com/blog/deep-double-descent/).
-
-<img src="notebooks/figures/double-descent.png" width=500>
-
-### [Metalearning a learning rate](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/metalearn-learn-rate.ipynb)
-A simple notebook that introduces gradient-based metalearning, also known as "unrolled optimization." In the spirit of [Maclaurin et al (2015)](http://proceedings.mlr.press/v37/maclaurin15.pdf) we use this technique to obtain the optimal learning rate for an MLP.
-
-![metalearn_lr.png](static/metalearn_lr.png)
-
-### [Metalearning an activation function](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/metalearn-activation-function.ipynb)
-This project uses the same principles as the learning rate example, but tackles a new problem that (to our knowledge) has not been tackled via gradient-based metalearning: how to obtain the perfect nonlinearity for a neural network. We start from an ELU activation function and parameterize the offset with an MLP. We use unrolled optimization to find the offset that leads to lowest training loss, across the last 200 steps, for an MLP classifier trained on MNIST-1D. Interestingly, the result somewhat resembles the Swish activation described by [Ramachandran et al. (2017)](https://arxiv.org/abs/1710.05941); the main difference is a positive regime between -4 and -1.
-
-![metalearn_afunc.png](static/metalearn_afunc.png)
-
-### [Benchmarking pooling methods](https://githubtocolab.com/greydanus/mnist1d/blob/master/notebooks/benchmark-pooling.ipynb)
-We investigate the relationship between number of training samples and usefulness of pooling methods. We find that pooling is typically very useful in the low-data regime but this advantage diminishes as the amount of training data increases.
-
-![pooling.png](static/pooling.png)
-
-
-Dependencies
---------
- * NumPy
- * SciPy
- * PyTorch
- * (others)
+- Python 3.7+
+- PyTorch 1.7+
+- NumPy
+- Matplotlib

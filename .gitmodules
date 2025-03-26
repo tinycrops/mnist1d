@@ -1,0 +1,6 @@
+[submodule "ARC-AGI-2"]
+	path = ARC-AGI-2
+	url = https://github.com/tinycrops/ARC-AGI-2.git
+[submodule "arc-dataset-collection"]
+	path = arc-dataset-collection
+	url = https://github.com/neoneye/arc-dataset-collection.git
